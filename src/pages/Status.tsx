@@ -76,6 +76,7 @@ export default function Status(props: MobileProps) {
         }
     />;
     // TODO: This could be a TaskListItem, I just need to parametrize the background of the whole TaskListItem
+    // TODO: I need to make it easier to organize the UI, rather than editing skeleton and page and setting spacing manually
     const buildSystemStatus = (status: WorkerStatus, dbInfoLocal: DBInfoAPIResponse) => <>
         {/* TODO: Margins here need some work */}
         {/* TaskWorker Status */}
@@ -127,6 +128,14 @@ export default function Status(props: MobileProps) {
             </ListItemAvatar>
             {/* TODO: Convert ISO time into a more readable time format here */}
             <ListItemText primary={dbInfoLocal.newest_entry_time} secondary="Newest logbook entry"/> 
+        </ListItem>
+        {/* Oldest entry time */}
+        <ListItem className=" bg-slate-200 rounded-2xl mt-2" sx={{marginRight: (props.isMobile ? "0" : "0.5rem")}}>
+            <ListItemAvatar sx={{color: "#aaaaaa", background: "#dddddd"}} className="rounded-full text-center pl-0 pr-0 pt-3 pb-3 mr-4" >
+                <PendingIcon/>
+            </ListItemAvatar>
+            {/* TODO: Convert ISO time into a more readable time format here */}
+            <ListItemText primary={dbInfoLocal.oldest_entry_time} secondary="Newest logbook entry"/> 
         </ListItem>
         {/* Database lock indicator */}
         <ListItem className=" bg-slate-200 rounded-2xl mt-2" sx={{marginLeft: (props.isMobile ? "0" : "0.5rem")}}>
@@ -220,6 +229,9 @@ export default function Status(props: MobileProps) {
                 {/* DB Newest Entry Time */}
                 <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4" sx={{marginRight: (props.isMobile ? "0" : "0.5rem")}}/>
 
+                {/* DB Oldest Entry Time */}
+                <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4" sx={{marginRight: (props.isMobile ? "0" : "0.5rem")}}/>
+
                 {/* DB Lock status */}
                 <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4" sx={{marginLeft: (props.isMobile ? "0" : "0.5rem")}}/>
             </div>
@@ -231,6 +243,7 @@ export default function Status(props: MobileProps) {
                 {/* Schedule */}
                 <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4" sx={{marginLeft: (props.isMobile ? "0" : "1rem")}}/>
             </div>
+
         </> :
         scheduleElements == null || workerElements == null || systemStatusElements == null ?
         // Error if the page fails to load
@@ -243,6 +256,7 @@ export default function Status(props: MobileProps) {
                 </div>
             </div>
         </>
+
         // Actual page
         : <>
             {/* System status */}
