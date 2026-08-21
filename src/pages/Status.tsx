@@ -23,7 +23,7 @@ import { useEffect, useState } from "react";
 import type { JSX } from "react";
 import { SelectiveText } from "../components/SelectiveText";
 
-// Sample data for initial rendering
+// TODO: remove this Sample data for initial rendering, replace fields to undefined
 const sampleSchedule: SchedulerAPIResponse = {
     schedule: [
         {
@@ -339,7 +339,7 @@ export default function Status(props: MobileProps) {
             ])  
             // Unset loading when schedule and worker data ready
                 .then(() => {setLoading(false)});
-                // TODO: a websocket could be used instead of this refreshing
+                // TODO: a websocket could be used instead of this annoying refreshing
         }, 1000); // Repeat every second
 
         return () => clearInterval(interval);
