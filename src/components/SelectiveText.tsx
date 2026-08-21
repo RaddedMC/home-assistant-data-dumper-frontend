@@ -6,4 +6,5 @@ export function SelectiveText(props: SelectiveTextProps) {
         (pair): pair is KeyedTextPair => pair[0] === props.selected
     );
     if (matchedPair) return matchedPair[1];
+    else return "";
 }

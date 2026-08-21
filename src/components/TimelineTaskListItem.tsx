@@ -1,6 +1,4 @@
 import type { TimelineTaskListItemProps } from "../type/appTypes/TimelineTaskListItemProps";
-import ListItem from "@mui/material/ListItem";
-import AdjustIcon from '@mui/icons-material/Adjust';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Typography from '@mui/material/Typography';
 import PendingIcon from '@mui/icons-material/Pending';

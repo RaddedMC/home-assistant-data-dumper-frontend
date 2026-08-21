@@ -1,5 +1,4 @@
 import type { ItemButtonProps } from "../type/appTypes/ItemButtonProps";
-import Button from '@mui/material/Button';
 import { StatusIcon } from "./DynamicStatusIcon";
 
 export default function ItemButton(props: ItemButtonProps) {
