@@ -1,16 +1,26 @@
-import { type ListItemProps } from "../type/appTypes/ListItemProps";
+import { type DynamicIconListItemProps, type ListItemProps } from "../type/appTypes/ListItemProps";
 import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
+import { DynamicStatusIcon, StatusIcon } from "./DynamicStatusIcon";
 
+export function DynamicIconTaskListItem(props: DynamicIconListItemProps) {
+    return <>
+        <div className="m-2">
+            <ListItem className="rounded-2xl" sx={{backgroundColor: props.backgroundColor}}>
+                <DynamicStatusIcon {...props.dynamicStatusIcon} />
+                <ListItemText primary={props.textPrimary} secondary={props.textSecondary} />
+            </ListItem>
+        </div>
+    </>
+}
 
 export default function TaskListItem(props: ListItemProps) {
     return <>
-        <ListItem className=" bg-gray-50 rounded-2xl mt-2">
-            <ListItemAvatar sx={{color: props.avatarMainColor, background: props.avatarBackgroundColor}} className="rounded-full text-center pl-0 pr-0 pt-3 pb-3 mr-4">
-                {props.avatar}
-            </ListItemAvatar>
-            <ListItemText primary={props.textPrimary} secondary={props.textSecondary} />
-        </ListItem>
+        <div className="m-2">
+            <ListItem className="rounded-2xl" sx={{backgroundColor: props.backgroundColor}}>
+                <StatusIcon {...props.statusIcon}/>
+                <ListItemText primary={props.textPrimary} secondary={props.textSecondary} />
+            </ListItem>    
+        </div>
     </>
 }

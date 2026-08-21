@@ -3,23 +3,14 @@ import {
     List,
     Typography
 } from "@mui/material";
-import TaskListItem from "../components/TaskListItem";
-import { type SchedulerAPIResponse, type WorkerAPIResponse, type SchedulerEntry, type WorkerTask, type WorkerStatus } from "../type/externalTypes/AddonWorkerTypes";
-import { type DBInfoAPIResponse } from "../type/externalTypes/DBInfoTypes";
+import TaskListItem, { DynamicIconTaskListItem } from "../components/TaskListItem";
+import { type SchedulerAPIResponse, type WorkerAPIResponse, type SchedulerEntry, type WorkerTask, type WorkerStatus, type DBInfoAPIResponse } from "../type/externalTypes/AddonWorkerTypes";
+import TimelineTaskListItem from "../components/TimelineTaskListItem";
+import ItemButton from "../components/ItemButton";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import {Skeleton } from "@mui/material";
-
-/* Icons needed:
- * - Running : LoopIcon
- * - Idle : PendingIcon
- * - Not started : ModeStandbyIcon
- * - Shut down : PowerSettingsNew
- * - Failed : ReportProblem
- * - Scheduled : CalendarMonth
- * - Completed : CheckCircle
-*/
 import LoopIcon from '@mui/icons-material/Loop';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PendingIcon from '@mui/icons-material/Pending';
@@ -30,13 +21,105 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import type { MobileProps } from "../type/appTypes/MobileProps";
 import { useEffect, useState } from "react";
 import type { JSX } from "react";
+import { SelectiveText } from "../components/SelectiveText";
+
+// Sample data for initial rendering
+const sampleSchedule: SchedulerAPIResponse = {
+    schedule: [
+        {
+            task: {
+                type: "Backup",
+                title: "Daily Backup",
+                status: "TaskState.COMPLETED",
+                description: "Backup completed successfully",
+                error: undefined
+            },
+            queue_time: "2026-08-21T02:00:00Z",
+            daily: true
+        },
+        {
+            task: {
+                type: "Fart",
+                title: "I farted",
+                status: "TaskState.FAILED",
+                description: "asdf",
+                error: "oopsie"
+            },
+            queue_time: "2026-08-21T02:00:00Z",
+            daily: true
+        },
+        {
+            task: {
+                type: "Slow",
+                title: "sloth",
+                status: "TaskState.RUNNING",
+                description: "this is taking forever",
+                error: undefined
+            },
+            queue_time: "2026-08-21T02:00:00Z",
+            daily: true
+        },
+        {
+            task: {
+                type: "Waiting",
+                title: "impatient",
+                status: "TaskState.NOT_STARTED",
+                description: "I want to go now!!!",
+                error: undefined
+            },
+            queue_time: "2026-08-21T02:00:00Z",
+            daily: true
+        },
+    ]
+};
+
+const sampleWorker: WorkerAPIResponse = {
+    status: "WorkerState.RUNNING",
+    tasks: [
+        {
+                type: "Backup",
+                title: "Daily Backup",
+                status: "TaskState.COMPLETED",
+                description: "Backup completed successfully",
+                error: undefined
+        },
+        {
+                type: "Fart",
+                title: "I farted",
+                status: "TaskState.FAILED",
+                description: "asdf",
+                error: "oopsie"
+        },
+        {
+                type: "Slow",
+                title: "sloth",
+                status: "TaskState.RUNNING",
+                description: "this is taking forever",
+                error: undefined
+        },
+        {
+                type: "Waiting",
+                title: "impatient",
+                status: "TaskState.NOT_STARTED",
+                description: "I want to go now!!!",
+                error: undefined
+        },
+    ]
+};
+
+const sampleDBInfo: DBInfoAPIResponse = {
+    entry_count: "123",
+    is_unlocked: true,
+    newest_entry_time: "2026-08-21T01:00:00Z",
+    oldest_entry_time: "2026-08-01T00:00:00Z"
+};
 
 export default function Status(props: MobileProps) {
     // -- States -- //
     // Data
-    const [schedule, setSchedule] = useState<SchedulerAPIResponse | undefined>(undefined);
-    const [worker, setWorker] = useState<WorkerAPIResponse | undefined>(undefined);
-    const [dbInfo, setDbInfo] = useState<DBInfoAPIResponse | undefined>(undefined);
+    const [schedule, setSchedule] = useState<SchedulerAPIResponse>(sampleSchedule);
+    const [worker, setWorker] = useState<WorkerAPIResponse>(sampleWorker);
+    const [dbInfo, setDbInfo] = useState<DBInfoAPIResponse>(sampleDBInfo);
     // Elements
     const [scheduleElements, setScheduleElements] = useState<JSX.Element[] | undefined>(undefined);
     const [workerElements, setWorkerElements] = useState<JSX.Element[] | undefined>(undefined);
@@ -46,116 +129,167 @@ export default function Status(props: MobileProps) {
 
     // -- Function to build elements for entries -- //
     const buildScheduleEntry = (entry: SchedulerEntry) => <TaskListItem
-        avatar={<CalendarMonthIcon/>}
+        statusIcon={{
+            avatar: <CalendarMonthIcon/>,
+            avatarMainColor: "black",
+            avatarBackgroundColor: "#dddddd"
+        }}
         textPrimary={entry.task.type + " : " + entry.task.title}
-        textSecondary={"will run at " + entry.queue_time + (entry.daily ? ", repeating daily" : "")} avatarMainColor={"black"} avatarBackgroundColor={"#dddddd"}
+        textSecondary={"will run at " + entry.queue_time + (entry.daily ? ", repeating daily" : "")}
+        backgroundColor="#F9FAFB"
     />;
-    const buildWorkerEntry = (entry: WorkerTask) => <TaskListItem
-        avatar={
-            entry.status == "TaskState.COMPLETED" ? <CheckCircleIcon/> :
-            entry.status == "TaskState.FAILED" ? <ReportProblemIcon/> :
-            entry.status == "TaskState.NOT_STARTED" ? <PendingIcon/> :
-            entry.status == "TaskState.RUNNING" ? <LoopIcon/> 
-            : <></>
-        }
+    const buildWorkerEntry = (entry: WorkerTask) => <DynamicIconTaskListItem
+        dynamicStatusIcon={{
+                iconList: [
+                    [
+                        "TaskState.COMPLETED",
+                        {
+                            avatar: <CheckCircleIcon/>,
+                            avatarMainColor: "#00aa00",
+                            avatarBackgroundColor: "#aaffaa"
+                        }
+                    ],
+                    [
+                        "TaskState.FAILED",
+                        {
+                            avatar: <ReportProblemIcon/>,
+                            avatarMainColor: "#aa0000",
+                            avatarBackgroundColor: "#ffaaaa"
+                        }
+                    ],
+                    [
+                        "TaskState.NOT_STARTED",
+                        {
+                            avatar: <PendingIcon/>,
+                            avatarMainColor: "#888888",
+                            avatarBackgroundColor: "#dddddd"
+                        }
+                    ],
+                    [
+                        "TaskState.RUNNING",
+                        {
+                            avatar: <LoopIcon/>,
+                            avatarMainColor: "#666666",
+                            avatarBackgroundColor: "#dddddd"
+                        }
+                    ],
+                    // Additional icon entries based on the general icon list comment
+                    [
+                        "TaskState.IDLE",
+                        {
+                            avatar: <PendingIcon/>,
+                            avatarMainColor: "#aaaaaa",
+                            avatarBackgroundColor: "#dddddd"
+                        }
+                    ],
+                    [
+                        "TaskState.SHUT_DOWN",
+                        {
+                            avatar: <PowerSettingsNewIcon/>,
+                            avatarMainColor: "#aa0000",
+                            avatarBackgroundColor: "#ffaaaa"
+                        }
+                    ],
+                    [
+                        "TaskState.SCHEDULED",
+                        {
+                            avatar: <CalendarMonthIcon/>,
+                            avatarMainColor: "#00aa00",
+                            avatarBackgroundColor: "#aaffaa"
+                        }
+                    ],
+                ],
+            selected: entry.status
+        }} 
         textPrimary={entry.type + " : " + entry.title}
         textSecondary={entry.status == "TaskState.FAILED" ? (entry.error ? entry.error : "") : entry.description}
-        avatarMainColor={
-            entry.status == "TaskState.COMPLETED" ? "#00aa00" :
-            entry.status == "TaskState.FAILED" ? "#aa0000" :
-            entry.status == "TaskState.NOT_STARTED" ? "#aaaaaa" :
-            entry.status == "TaskState.RUNNING" ? "black" 
-            : "white"
-        }
-        avatarBackgroundColor={
-            entry.status == "TaskState.COMPLETED" ? "#aaffaa" :
-            entry.status == "TaskState.FAILED" ? "#ffaaaa" :
-            entry.status == "TaskState.NOT_STARTED" ? "#dddddd" :
-            entry.status == "TaskState.RUNNING" ? "#bbbbbb" 
-            : "white"
-        }
+        backgroundColor="#F9FAFB"
     />;
-    // TODO: This could be a TaskListItem, I just need to parametrize the background of the whole TaskListItem
-    // TODO: I need to make it easier to organize the UI, rather than editing skeleton and page and setting spacing manually
     const buildSystemStatus = (status: WorkerStatus, dbInfoLocal: DBInfoAPIResponse) => <>
-        {/* TODO: Margins here need some work */}
-        {/* TaskWorker Status */}
-        <ListItem className=" bg-slate-200 rounded-2xl mt-2" sx={{marginRight: (props.isMobile ? "0" : "0.5rem")}}>
-            <ListItemAvatar sx={{
-                color:
-                    status == "WorkerState.IDLE" ? "black" :
-                    status == "WorkerState.NOT_STARTED" ? "#aaaaaa" :
-                    status == "WorkerState.RUNNING" ? "#00aa00" :
-                    status == "WorkerState.SHUT_DOWN" ? "#aa0000" : ""
-                ,
-                background:
-                    status == "WorkerState.IDLE" ? "#bbbbbb" :
-                    status == "WorkerState.NOT_STARTED" ? "#dddddd" :
-                    status == "WorkerState.RUNNING" ? "#aaffaa" :
-                    status == "WorkerState.SHUT_DOWN" ? "#ffaaaa" : ""
-            }} className="rounded-full text-center pl-0 pr-0 pt-3 pb-3 mr-4">
-                {
-                    status == "WorkerState.IDLE" ? <ModeStandbyIcon/> :
-                    status == "WorkerState.NOT_STARTED" ? <PendingIcon/> :
-                    status == "WorkerState.RUNNING" ? <LoopIcon/> :
-                    status == "WorkerState.SHUT_DOWN" ? <PowerSettingsNewIcon/> : <></>
-                }
-            </ListItemAvatar>
-            <ListItemText primary={"System is " + (
-                    status == "WorkerState.IDLE" ? "Idle" :
-                    status == "WorkerState.NOT_STARTED" ? "Not running" :
-                    status == "WorkerState.RUNNING" ? "Running" :
-                    status == "WorkerState.SHUT_DOWN" ? "Shutting down" : ""
-                )
-            } secondary={
-                status == "WorkerState.IDLE" ? "No tasks are currently active" :
-                status == "WorkerState.NOT_STARTED" ? "The addon is still starting up" :
-                status == "WorkerState.RUNNING" ? "The addon is completing a task" :
-                status == "WorkerState.SHUT_DOWN" ? "The addon was shut down" : ""
-            } />
-        </ListItem>
-        {/* Database entry count */}
-        <ListItem className=" bg-slate-200 rounded-2xl mt-2" sx={{marginLeft: (props.isMobile ? "0" : "0.5rem")}}>
-            <ListItemAvatar sx={{color: "#aaaaaa", background: "#dddddd"}} className="rounded-full text-center pl-0 pr-0 pt-3 pb-3 mr-4" >
-                <PendingIcon/>
-            </ListItemAvatar>
-            <ListItemText primary={dbInfoLocal.entry_count} secondary="Logbook entries dumped"/>
-        </ListItem>
-        {/* Newest entry time */}
-        <ListItem className=" bg-slate-200 rounded-2xl mt-2" sx={{marginRight: (props.isMobile ? "0" : "0.5rem")}}>
-            <ListItemAvatar sx={{color: "#aaaaaa", background: "#dddddd"}} className="rounded-full text-center pl-0 pr-0 pt-3 pb-3 mr-4" >
-                <PendingIcon/>
-            </ListItemAvatar>
-            {/* TODO: Convert ISO time into a more readable time format here */}
-            <ListItemText primary={dbInfoLocal.newest_entry_time} secondary="Newest logbook entry"/> 
-        </ListItem>
-        {/* Oldest entry time */}
-        <ListItem className=" bg-slate-200 rounded-2xl mt-2" sx={{marginRight: (props.isMobile ? "0" : "0.5rem")}}>
-            <ListItemAvatar sx={{color: "#aaaaaa", background: "#dddddd"}} className="rounded-full text-center pl-0 pr-0 pt-3 pb-3 mr-4" >
-                <PendingIcon/>
-            </ListItemAvatar>
-            {/* TODO: Convert ISO time into a more readable time format here */}
-            <ListItemText primary={dbInfoLocal.oldest_entry_time} secondary="Newest logbook entry"/> 
-        </ListItem>
         {/* Database lock indicator */}
-        <ListItem className=" bg-slate-200 rounded-2xl mt-2" sx={{marginLeft: (props.isMobile ? "0" : "0.5rem")}}>
-            <ListItemAvatar sx={{
-                    color:
-                        dbInfoLocal.is_unlocked ? "#00aa00" : "#aa0000"
-                    ,
-                    background:
-                        dbInfoLocal.is_unlocked ? "#aaffaa" : "#ffaaaa"
-                }} className="rounded-full text-center pl-0 pr-0 pt-3 pb-3 mr-4" >
-                {dbInfoLocal.is_unlocked ? <CheckCircleIcon/> : <ReportProblemIcon/>}
-            </ListItemAvatar>
-            <ListItemText primary={
-                dbInfoLocal.is_unlocked ? "Database is UNLOCKED" : "Database is LOCKED"
-            } secondary={
-                dbInfoLocal.is_unlocked ? "" : "If like this for a while, the app likely crashed"
-            }/>
-        </ListItem>
+        {dbInfoLocal.is_unlocked ?
+            <TaskListItem
+                statusIcon={{
+                    avatar: <ReportProblemIcon/>,
+                    avatarMainColor: "#aa0000",
+                    avatarBackgroundColor: "#ffaaaa"
+                }}
+                textPrimary="Database is LOCKED"
+                textSecondary="If it's been locked for a while, the app likely crashed"
+                backgroundColor="#efe8f0"
+            />  : 
+            <></>
+        }
+
+        {/* TaskWorker Status */}
+        <DynamicIconTaskListItem
+            dynamicStatusIcon={{
+                iconList: [
+                    [
+                        "WorkerState.IDLE",
+                        {
+                            avatar: <ModeStandbyIcon/>,
+                            avatarMainColor: "black",
+                            avatarBackgroundColor: "#dddddd"
+                        }
+                    ],
+                    [
+                        "WorkerState.NOT_STARTED",
+                        {
+                            avatar: <PendingIcon/>,
+                            avatarMainColor: "#888888",
+                            avatarBackgroundColor: "#dddddd"
+                        }
+                    ],
+                    [
+                        "WorkerState.RUNNING",
+                        {
+                            avatar: <LoopIcon/>,
+                            avatarMainColor: "#00aa00",
+                            avatarBackgroundColor: "#aaffaa"
+                        }
+                    ],
+                    [
+                        "WorkerState.IDLE",
+                        {
+                            avatar: <PowerSettingsNewIcon/>,
+                            avatarMainColor: "#aa0000",
+                            avatarBackgroundColor: "#ffaaaa"
+                        }
+                    ],
+                ],
+                selected: status
+            }}
+            textPrimary={"System is " + SelectiveText({
+                textList: [
+                    ["WorkerState.IDLE", "Idle"],
+                    ["WorkerState.NOT_STARTED", "Not running"],
+                    ["WorkerState.RUNNING", "Running"],
+                    ["WorkerState.SHUT_DOWN", "Shutting down"]
+                ],
+                selected: status
+            })}
+            textSecondary={SelectiveText({
+                textList: [
+                    ["WorkerState.IDLE", "No tasks are currently active"],
+                    ["WorkerState.NOT_STARTED", "The app is still starting up"],
+                    ["WorkerState.RUNNING", "The app is completing a task"],
+                    ["WorkerState.SHUT_DOWN", "The app was shut down"]
+                ],
+                selected: status
+            })}
+            backgroundColor="#e2e8f0"
+        />
+
+        {/* Test: New entry time */}
+        <TimelineTaskListItem
+            textTitle="Data timeline"
+            textTop={"Oldest: " + dbInfoLocal.oldest_entry_time}
+            textMiddle={dbInfoLocal.entry_count + " entries"}
+            textBottom={"Newest: " + dbInfoLocal.newest_entry_time}
+            backgroundColor="#e2e8f0"
+        />
     </>
-    ;
 
     // -- Function to update page content on change of state -- //
     useEffect(() => {
@@ -218,36 +352,24 @@ export default function Status(props: MobileProps) {
         // Loader if page is still loading
         ? <>
             {/* System Status */}
-            {/* TODO: Margins here need some work */}
             <div className={props.isMobile ? "" : "grid grid-cols-2 grid-rows-2"}> {/* TODO: Same as below with tablet view */}
-                {/* TaskWorker Status */}
                 <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4" sx={{marginRight: (props.isMobile ? "0" : "0.5rem")}}/>
-
-                {/* DB Entry Count */}
                 <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4" sx={{marginLeft: (props.isMobile ? "0" : "0.5rem")}}/>
-
-                {/* DB Newest Entry Time */}
                 <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4" sx={{marginRight: (props.isMobile ? "0" : "0.5rem")}}/>
-
-                {/* DB Oldest Entry Time */}
                 <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4" sx={{marginLeft: (props.isMobile ? "0" : "0.5rem")}}/>
-
-                {/* DB Lock status */}
-                <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4" sx={{marginRight: (props.isMobile ? "0" : "0.5rem")}}/>
             </div>
             {/* Mobile UI splitter*/}
             <div className={props.isMobile ? "" : "flex flex-row"}> {/* TODO: Same as below with tablet view */}
                 {/* Task queue */}
-                <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4"/>
-
+                <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4 pb-16" sx={{marginRight: (props.isMobile ? "0" : "0.5rem")}}/>
                 {/* Schedule */}
-                <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4" sx={{marginLeft: (props.isMobile ? "0" : "1rem")}}/>
+                <Skeleton animation="wave" className="rounded-2xl w-full mt-2 p-4 pb-16" sx={{marginLeft: (props.isMobile ? "0" : "0.5rem")}}/>
             </div>
 
+        {/* // Error if the page fails to load
+        // TODO: Error does not appear if the data fails to load during a refresh */}
         </> :
         scheduleElements == null || workerElements == null || systemStatusElements == null ?
-        // Error if the page fails to load
-        // TODO: Error does not appear if the data fails to load during a refresh
         <>
             <div className="flex h-full w-full items-center justify-center">
                 <div className=" flex bg-slate-200 rounded-2xl p-4">
@@ -259,9 +381,11 @@ export default function Status(props: MobileProps) {
 
         // Actual page
         : <>
-            {/* System status */}
-            <div className={props.isMobile ? "" : "grid grid-cols-2 grid-rows-2"}>
+            <div className={props.isMobile ? "" : "grid grid-cols-2"}>
+                {/* System status */}
                 {systemStatusElements}
+                {/* Manual collection button */}
+                <ItemButton text={"Start data collection now"} statusIcon={{}} color="purple" callback={()=>{alert("Hello!")}}/>
             </div>            
 
             {/* Mobile UI splitter*/}

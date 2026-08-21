@@ -1,9 +1,15 @@
-import type { ReactNode } from "react";
+import type { DynamicStatusIconProps, StatusIconProps } from "./DynamicStatusIconProps";
 
 export type ListItemProps = {
-    avatar: ReactNode;
+    statusIcon: StatusIconProps;
     textPrimary: string;
     textSecondary: string;
-    avatarBackgroundColor: string;
-    avatarMainColor: string;
+    backgroundColor: string;
 };
+
+export type DynamicIconListItemProps = {
+    dynamicStatusIcon: DynamicStatusIconProps;
+    textPrimary: string;
+    textSecondary: string;
+    backgroundColor: string;
+}
