@@ -389,11 +389,11 @@ export default function Status(props: MobileProps) {
                     text={"Start new data collection"}
                     statusIcon={{
                         avatar: <PlayArrowIcon/>,
-                        avatarBackgroundColor: "red",
-                        avatarMainColor: "purple"
+                        avatarBackgroundColor: "#aaaaff",
+                        avatarMainColor: "#0000aa"
                     }}
-                    color="purple"
-                    callback={()=>{alert("Hello!")}}
+                    colour="#ccccff"
+                    callback={() => { window.location.href = '/api/run/collection'; }}
                 />
             </div>            
 

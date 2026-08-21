@@ -3,10 +3,13 @@ import Button from '@mui/material/Button';
 import { StatusIcon } from "./DynamicStatusIcon";
 
 export default function ItemButton(props: ItemButtonProps) {
-    return <div>
-        <Button onClick={props.callback} color="primary" sx={{backgroundColor: props.colour}}>
-            <StatusIcon {...props.statusIcon}/>
-        {props.text}
-        </Button>
+    return <div className="m-auto">
+        {/* Outer wrapper for layout */}
+            <div className="border-4 rounded-2xl flex p-2 px-4 transition duration-200 ease-in-out cursor-pointer shadow-lg hover:shadow-2xl transform hover:scale-105 active:scale-95" style={{backgroundColor: props.colour, borderColor: "#00000011"}} onClick={props.callback}>
+            <div className="flex flex-row m-auto items-center">
+                <StatusIcon {...props.statusIcon}/>
+                <p className="text-lg">{props.text}</p>
+            </div>
+        </div>
     </div>
 }
