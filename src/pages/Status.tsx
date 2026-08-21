@@ -7,9 +7,7 @@ import TaskListItem, { DynamicIconTaskListItem } from "../components/TaskListIte
 import { type SchedulerAPIResponse, type WorkerAPIResponse, type SchedulerEntry, type WorkerTask, type WorkerStatus, type DBInfoAPIResponse } from "../type/externalTypes/AddonWorkerTypes";
 import TimelineTaskListItem from "../components/TimelineTaskListItem";
 import ItemButton from "../components/ItemButton";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemText from "@mui/material/ListItemText";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import {Skeleton } from "@mui/material";
 import LoopIcon from '@mui/icons-material/Loop';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
@@ -126,6 +124,7 @@ export default function Status(props: MobileProps) {
     const [systemStatusElements, setSystemStatusElements] = useState<JSX.Element | undefined>(undefined);
     // Page state
     const [isLoading, setLoading] = useState(true);
+    const [hasContent, setHasContent] = useState(false);
 
     // -- Function to build elements for entries -- //
     const buildScheduleEntry = (entry: SchedulerEntry) => <TaskListItem
@@ -295,6 +294,7 @@ export default function Status(props: MobileProps) {
     useEffect(() => {
         if (!isLoading) {
             console.log("Data loaded!");
+            setHasContent(true);
         }
         setScheduleElements(schedule?.schedule.map(buildScheduleEntry));
         setWorkerElements(worker?.tasks.map(buildWorkerEntry));
@@ -338,7 +338,7 @@ export default function Status(props: MobileProps) {
                     })
             ])  
             // Unset loading when schedule and worker data ready
-                .then(() => {setLoading(false)});
+                .then(() => {setLoading(false);});
                 // TODO: a websocket could be used instead of this annoying refreshing
         }, 1000); // Repeat every second
 
@@ -348,7 +348,7 @@ export default function Status(props: MobileProps) {
     // Page content
     return (
         
-        isLoading
+        !hasContent
         // Loader if page is still loading
         ? <>
             {/* System Status */}
@@ -385,7 +385,16 @@ export default function Status(props: MobileProps) {
                 {/* System status */}
                 {systemStatusElements}
                 {/* Manual collection button */}
-                <ItemButton text={"Start data collection now"} statusIcon={{}} color="purple" callback={()=>{alert("Hello!")}}/>
+                <ItemButton
+                    text={"Start new data collection"}
+                    statusIcon={{
+                        avatar: <PlayArrowIcon/>,
+                        avatarBackgroundColor: "red",
+                        avatarMainColor: "purple"
+                    }}
+                    color="purple"
+                    callback={()=>{alert("Hello!")}}
+                />
             </div>            
 
             {/* Mobile UI splitter*/}
