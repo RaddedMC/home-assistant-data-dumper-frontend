@@ -206,7 +206,7 @@ export default function Status(props: MobileProps) {
     />;
     const buildSystemStatus = (status: WorkerStatus, dbInfoLocal: DBInfoAPIResponse) => <>
         {/* Database lock indicator */}
-        {dbInfoLocal.is_unlocked ?
+        {!dbInfoLocal.is_unlocked ?
             <TaskListItem
                 statusIcon={{
                     avatar: <ReportProblemIcon/>,
@@ -219,6 +219,16 @@ export default function Status(props: MobileProps) {
             />  : 
             <></>
         }
+
+        {/* Test: Data timeline */}
+        <TimelineTaskListItem
+            textTitle="Data timeline"
+            textTop={"Oldest: " + dbInfoLocal.oldest_entry_time}
+            textMiddle={dbInfoLocal.entry_count + " entries"}
+            textBottom={"Newest: " + dbInfoLocal.newest_entry_time}
+            backgroundColor="#e2e8f0"
+            textOverride={Number(dbInfoLocal.entry_count) === 0 ? "Database is empty" : (dbInfoLocal.is_unlocked ? undefined : "Database is locked")}
+        />
 
         {/* TaskWorker Status */}
         <DynamicIconTaskListItem
@@ -277,15 +287,6 @@ export default function Status(props: MobileProps) {
                 ],
                 selected: status
             })}
-            backgroundColor="#e2e8f0"
-        />
-
-        {/* Test: New entry time */}
-        <TimelineTaskListItem
-            textTitle="Data timeline"
-            textTop={"Oldest: " + dbInfoLocal.oldest_entry_time}
-            textMiddle={dbInfoLocal.entry_count + " entries"}
-            textBottom={"Newest: " + dbInfoLocal.newest_entry_time}
             backgroundColor="#e2e8f0"
         />
     </>
@@ -384,7 +385,8 @@ export default function Status(props: MobileProps) {
             <div className={props.isMobile ? "" : "grid grid-cols-2"}>
                 {/* System status */}
                 {systemStatusElements}
-                {/* Manual collection button */}
+                {/* Manual collection button, display only for unlocked database */}
+                {dbInfo.is_unlocked ?
                 <ItemButton
                     text={"Start new data collection"}
                     statusIcon={{
@@ -394,7 +396,9 @@ export default function Status(props: MobileProps) {
                     }}
                     colour="#ccccff"
                     callback={() => { window.location.href = '/api/run/collection'; }}
-                />
+                /> : <></>
+                }
+                
             </div>            
 
             {/* Mobile UI splitter*/}

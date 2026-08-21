@@ -4,4 +4,5 @@ export type TimelineTaskListItemProps = {
     textMiddle: string;
     textBottom: string;
     backgroundColor: string;
+    textOverride: string | undefined;
 };
