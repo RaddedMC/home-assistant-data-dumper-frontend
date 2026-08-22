@@ -124,7 +124,7 @@ export default function Status(props: MobileProps) {
                     avatarBackgroundColor: "#ffaaaa"
                 }}
                 textPrimary="Database is LOCKED"
-                textSecondary="If it's been locked for a while, the app likely crashed"
+                textSecondary="If it's been locked for a while with no running tasks, the app likely crashed"
                 backgroundColor="#efe8f0"
             />  : 
             <></>
