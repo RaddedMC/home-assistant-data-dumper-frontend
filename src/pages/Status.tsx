@@ -22,103 +22,12 @@ import type { JSX } from "react";
 import { SelectiveText } from "../components/SelectiveText";
 import toast from 'react-hot-toast';
 
-// TODO: remove this Sample data for initial rendering, replace fields to undefined
-const sampleSchedule: SchedulerAPIResponse = {
-    schedule: [
-        {
-            task: {
-                type: "Backup",
-                title: "Daily Backup",
-                status: "TaskState.COMPLETED",
-                description: "Backup completed successfully",
-                error: undefined
-            },
-            queue_time: "2026-08-21T02:00:00Z",
-            daily: true
-        },
-        {
-            task: {
-                type: "Fart",
-                title: "I farted",
-                status: "TaskState.FAILED",
-                description: "asdf",
-                error: "oopsie"
-            },
-            queue_time: "2026-08-21T02:00:00Z",
-            daily: true
-        },
-        {
-            task: {
-                type: "Slow",
-                title: "sloth",
-                status: "TaskState.RUNNING",
-                description: "this is taking forever",
-                error: undefined
-            },
-            queue_time: "2026-08-21T02:00:00Z",
-            daily: true
-        },
-        {
-            task: {
-                type: "Waiting",
-                title: "impatient",
-                status: "TaskState.NOT_STARTED",
-                description: "I want to go now!!!",
-                error: undefined
-            },
-            queue_time: "2026-08-21T02:00:00Z",
-            daily: true
-        },
-    ]
-};
-
-const sampleWorker: WorkerAPIResponse = {
-    status: "WorkerState.RUNNING",
-    tasks: [
-        {
-                type: "Backup",
-                title: "Daily Backup",
-                status: "TaskState.COMPLETED",
-                description: "Backup completed successfully",
-                error: undefined
-        },
-        {
-                type: "Fart",
-                title: "I farted",
-                status: "TaskState.FAILED",
-                description: "asdf",
-                error: "oopsie"
-        },
-        {
-                type: "Slow",
-                title: "sloth",
-                status: "TaskState.RUNNING",
-                description: "this is taking forever",
-                error: undefined
-        },
-        {
-                type: "Waiting",
-                title: "impatient",
-                status: "TaskState.NOT_STARTED",
-                description: "I want to go now!!!",
-                error: undefined
-        },
-    ]
-};
-
-const sampleDBInfo: DBInfoAPIResponse = {
-    entry_count: "123",
-    is_unlocked: true,
-    newest_entry_time: "2026-08-21T01:00:00Z",
-    oldest_entry_time: "2026-08-01T00:00:00Z"
-};
-
 export default function Status(props: MobileProps) {
     // -- States -- //
     // Data
-    const [schedule, setSchedule] = useState<SchedulerAPIResponse>(sampleSchedule);
-    const [worker, setWorker] = useState<WorkerAPIResponse>(sampleWorker);
-    const [dbInfo, setDbInfo] = useState<DBInfoAPIResponse>(sampleDBInfo);
+    const [schedule, setSchedule] = useState<SchedulerAPIResponse | undefined>(undefined);
+    const [worker, setWorker] = useState<WorkerAPIResponse | undefined>(undefined);
+    const [dbInfo, setDbInfo] = useState<DBInfoAPIResponse | undefined>(undefined);
     // Elements
     const [scheduleElements, setScheduleElements] = useState<JSX.Element[] | undefined>(undefined);
     const [workerElements, setWorkerElements] = useState<JSX.Element[] | undefined>(undefined);
@@ -306,7 +215,7 @@ export default function Status(props: MobileProps) {
     // -- Obtain data from addon API -- //
     useEffect(() => {
         const interval = setInterval(() => {
-            setLoading(true); // TODO: Changing loading to True/False causes flickering, but not using it prevents the page from updating
+            setLoading(true);
             Promise.all([
                 // Fetch schedule
                 fetch("api/worker/schedule")
@@ -387,7 +296,7 @@ export default function Status(props: MobileProps) {
                 {/* System status */}
                 {systemStatusElements}
                 {/* Manual collection button, display only for unlocked database */}
-                {dbInfo.is_unlocked ?
+                {dbInfo?.is_unlocked ?
                 <ItemButton
                     text={"Start new data collection"}
                     statusIcon={{
@@ -412,8 +321,6 @@ export default function Status(props: MobileProps) {
             </div>            
 
             {/* Mobile UI splitter*/}
-            {/* TODO: Scroll on overflow (tablet only) */}
-            {/* TODO: The tablet view can get a little squishy when the sidebar is open */}
             <div className={props.isMobile ? "" : "flex flex-row"}>
                 {/* Task queue */}
                 <div className="bg-slate-200 rounded-2xl w-full mt-2 p-4">

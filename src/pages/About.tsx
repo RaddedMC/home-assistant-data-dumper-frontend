@@ -17,9 +17,9 @@ export default function About() {
                     </Typography>
                     <Box className="flex justify-center">
                         <Stack direction="row" spacing={1} className="pt-4">
-                            {/* TODO: Add Github repository */}
                             <Chip onClick={()=>{window.open("https://github.com/RaddedMC/home-assistant-data-dumper", "_blank")}} icon={<FaGithub size="1.5em"/>} label="GitHub"/>
                             <Chip onClick={()=>{window.open("https://github.com/RaddedMC/home-assistant-data-dumper-frontend", "_blank")}} icon={<FaGithub size="1.5em"/>} label="GitHub: Frontend"/>
+                            <Chip onClick={()=>{window.open("https://github.com/RaddedMC/home-assistant-addon-repo", "_blank")}} icon={<FaGithub size="1.5em"/>} label="GitHub: App Repo"/>
                         </Stack>
                     </Box>
                     <Typography className="pt-4">
