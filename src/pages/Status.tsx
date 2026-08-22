@@ -338,6 +338,8 @@ export default function Status(props: MobileProps) {
                     </List>
                 </div>
             </div>
+
+            <span className=" text-center">Note: queued and scheduled task history is cleared when the app is restarted.</span>
             <ExportButton/>
         </>
     )
