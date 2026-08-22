@@ -134,7 +134,7 @@ export default function Status(props: MobileProps) {
         <TimelineTaskListItem
             textTitle="Data timeline"
             textTop={"Oldest: " + dbInfoLocal.oldest_entry_time}
-            textMiddle={dbInfoLocal.entry_count + " entries"}
+            textMiddle={dbInfoLocal.entry_count + " entries"} // TODO: Rich number formatting could be nice
             textBottom={"Newest: " + dbInfoLocal.newest_entry_time}
             backgroundColor="#e2e8f0"
             textOverride={Number(dbInfoLocal.entry_count) === 0 ? "Database is empty" : (dbInfoLocal.is_unlocked ? undefined : "Database is locked")}
