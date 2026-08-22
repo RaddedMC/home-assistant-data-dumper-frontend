@@ -309,7 +309,7 @@ export default function Status(props: MobileProps) {
             setLoading(true); // TODO: Changing loading to True/False causes flickering, but not using it prevents the page from updating
             Promise.all([
                 // Fetch schedule
-                fetch("/api/worker/schedule")
+                fetch("api/worker/schedule")
                     .then((response) => response.json())
                     .then((data: SchedulerAPIResponse) => {
                         console.log(data);
@@ -319,7 +319,7 @@ export default function Status(props: MobileProps) {
                         console.error(err.message);
                     }),
                 // Fetch worker
-                fetch("/api/worker/tasks")
+                fetch("api/worker/tasks")
                     .then((response) => response.json())
                     .then((data: WorkerAPIResponse) => {
                         console.log(data);
@@ -329,7 +329,7 @@ export default function Status(props: MobileProps) {
                         console.error(err.message);
                     }),
                 // Fetch db status
-                fetch("/api/db/info")
+                fetch("api/db/info")
                     .then((response) => response.json())
                     .then((data: DBInfoAPIResponse) => {
                         console.log(data);
@@ -398,7 +398,7 @@ export default function Status(props: MobileProps) {
                     colour="#ccccff"
                     callback={() => {
                         toast.promise(
-                            fetch('/api/run/collection'),
+                            fetch('api/run/collection'),
                             {
                                 loading: "Starting data collection",
                                 success: "Data collection started",

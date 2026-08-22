@@ -6,7 +6,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 export default function ExportButton() {
     return (
         <>
-            <a href="/api/export/sqlite">
+            <a href="api/export/sqlite">
                 <Fab
                 variant="extended"
                 color="primary"

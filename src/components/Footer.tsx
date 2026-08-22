@@ -15,7 +15,7 @@ export default function Footer() {
 
     // -- Retrieve versions from API -- //
     useEffect(() => {
-        fetch("/api/versions")
+        fetch("api/versions")
             .then((response) => response.json())
             .then((data: VersionsAPIResponse) => {
                 console.log(data);
