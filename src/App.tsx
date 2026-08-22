@@ -18,6 +18,7 @@ import HamburgerMenu from "./components/HamburgerMenu";
 import Footer from "./components/Footer";
 import FourOhFour from "./pages/404"
 import { useIsMobile } from "./hooks/isMobile";
+import { Toaster } from 'react-hot-toast';
 
 function AppContent() {
     const currentPagePath = useLocation().pathname;
@@ -35,6 +36,7 @@ function AppContent() {
 
     return (
         <>
+            <Toaster/>
             <Box sx={{display:"flex"}}>
                 <Box component="nav" sx={{width: isMobile || !menuOpen ? 0 : 250, flexShrink:{sm:0}}}>
                     {menuOpen || isMobile

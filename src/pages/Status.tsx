@@ -20,6 +20,7 @@ import type { MobileProps } from "../type/appTypes/MobileProps";
 import { useEffect, useState } from "react";
 import type { JSX } from "react";
 import { SelectiveText } from "../components/SelectiveText";
+import toast from 'react-hot-toast';
 
 // TODO: remove this Sample data for initial rendering, replace fields to undefined
 const sampleSchedule: SchedulerAPIResponse = {
@@ -395,7 +396,16 @@ export default function Status(props: MobileProps) {
                         avatarMainColor: "#0000aa"
                     }}
                     colour="#ccccff"
-                    callback={() => { window.location.href = '/api/run/collection'; }}
+                    callback={() => {
+                        toast.promise(
+                            fetch('/api/run/collection'),
+                            {
+                                loading: "Starting data collection",
+                                success: "Data collection started",
+                                error: "Unable to start data collection"
+                            }
+                        );
+                    }}
                 /> : <></>
                 }
                 
